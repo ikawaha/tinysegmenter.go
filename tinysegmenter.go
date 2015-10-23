@@ -123,7 +123,7 @@ func (s *Segmenter) Segment(str string) []string {
 		if score > 0 {
 			result = append(result, strings.Join(word, ""))
 			word = word[0:0]
-			p = "S"
+			p = "B"
 		}
 		p1, p2, p3 = p2, p3, p
 		word = append(word, seg[i])
