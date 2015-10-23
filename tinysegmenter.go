@@ -1,19 +1,11 @@
 package tinysegmenter
 
 import (
-	"regexp"
+	"unicode"
 	"unicode/utf8"
 )
 
-type CharType struct {
-	name rune
-	re   *regexp.Regexp
-}
-
-type Segmenter struct {
-	chartypes []CharType
-	model     map[string]int
-}
+type Segmenter struct{}
 
 const (
 	Achar = 'A'
@@ -26,31 +18,66 @@ const (
 
 func NewSegmenter() *Segmenter {
 	s := new(Segmenter)
-	regs := []struct {
-		reg      string
-		category rune
-	}{
-		{"[一二三四五六七八九十百千万億兆]", 'M'},
-		{"[一-龠々〆ヵヶ]", 'H'},
-		{"[ぁ-ん]", 'I'},
-		{"[ァ-ヴーｱ-ﾝﾞｰ]", 'K'},
-		{"[a-zA-Zａ-ｚＡ-Ｚ]", 'A'},
-		{"[0-9０-９]", 'N'},
-	}
-
-	for _, v := range regs {
-		re, _ := regexp.Compile(v.reg)
-		s.chartypes = append(s.chartypes, CharType{name: v.category, re: re})
-	}
-
 	return s
 }
 
+var (
+	kannumTable = []rune{
+		'一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
+		'百', '千', '万', '億', '兆',
+	}
+	kanjiTable = &unicode.RangeTable{ //[一-龠々〆ヵヶ]
+		R16: []unicode.Range16{
+			{0x3005, 0x3006, 1},
+			{0x30F5, 0x30F6, 1},
+			{0x4E00, 0xff9E, 1},
+		},
+	}
+	hiraganaTable = &unicode.RangeTable{ //[ぁ-ん]
+		R16: []unicode.Range16{
+			{0x3041, 0x3093, 1},
+		},
+	}
+	katakanaTable = &unicode.RangeTable{ //[ァ-ヴーｱ-ﾝﾞｰ]
+		R16: []unicode.Range16{
+			{0x30A1, 0x30F4, 1},
+			{0x30FC, 0x30FC, 1},
+			{0xFF70, 0xFF9E, 1},
+		},
+	}
+	alphabetTable = &unicode.RangeTable{ //[a-zA-Zａ-ｚＡ-Ｚ]
+		R16: []unicode.Range16{
+			{0x41, 0x5A, 1},
+			{0x61, 0x7A, 1},
+			{0xFF21, 0xFF3A, 1},
+			{0xFF41, 0xFF5A, 1},
+		},
+	}
+	numberTable = &unicode.RangeTable{ //[0-9０-９]
+		R16: []unicode.Range16{
+			{0x30, 0x39, 1},
+			{0xFF10, 0xFF19, 1},
+		},
+	}
+)
+
 func (s *Segmenter) gettype(str rune) rune {
-	for _, v := range s.chartypes {
-		if v.re.MatchString(string(str)) {
-			return v.name
+	for _, x := range kannumTable {
+		if x == str {
+			return 'M'
 		}
+	}
+	switch {
+	case unicode.In(str, kanjiTable):
+		return 'H'
+	case unicode.In(str, hiraganaTable):
+		return 'I'
+	case unicode.In(str, katakanaTable):
+		return 'K'
+	case unicode.In(str, alphabetTable):
+		return 'A'
+	case unicode.In(str, numberTable):
+		return 'N'
 	}
 	return 'O'
 }
