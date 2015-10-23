@@ -49,18 +49,21 @@ func (s *Segmenter) Segment(str string) []string {
 	o := strings.Split(str, "")
 	m := s.model
 
-	ctype := []string{"O", "O", "O"}
+	ctype := make([]string, 0, len(str)+6)
+	ctype = append(ctype, "O", "O", "O")
 	for _, v := range o {
 		ctype = append(ctype, s.gettype(v))
 	}
 	ctype = append(ctype, "O", "O", "O")
 
-	seg := []string{"B3", "B2", "B1"}
+	seg := make([]string, 0, len(str)+6)
+	seg = append(seg, "B3", "B2", "B1")
 	seg = append(seg, o...)
 	seg = append(seg, "E1", "E2", "E3")
 
-	var result []string
-	word := []string{seg[3]}
+	result := make([]string, 0, len(str))
+	word := make([]string, 0, len(str))
+	word = append(word, seg[3])
 	p1, p2, p3 := "U", "U", "U"
 
 	for i := 4; i < len(seg)-3; i++ {
