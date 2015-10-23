@@ -5,22 +5,6 @@ import (
 	"unicode/utf8"
 )
 
-type Segmenter struct{}
-
-const (
-	Achar = 'A'
-	Ichar = 'I'
-	Hchar = 'H'
-	Ochar = 'O'
-	Uchar = 'U'
-	Bchar = 'B'
-)
-
-func NewSegmenter() *Segmenter {
-	s := new(Segmenter)
-	return s
-}
-
 var (
 	kannumTable = []rune{
 		'一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
@@ -61,84 +45,84 @@ var (
 	}
 )
 
-func (s *Segmenter) gettype(str rune) rune {
+func gettype(c rune) rune {
 	for _, x := range kannumTable {
-		if x == str {
+		if x == c {
 			return 'M'
 		}
 	}
 	switch {
-	case unicode.In(str, kanjiTable):
+	case unicode.In(c, kanjiTable):
 		return 'H'
-	case unicode.In(str, hiraganaTable):
+	case unicode.In(c, hiraganaTable):
 		return 'I'
-	case unicode.In(str, katakanaTable):
+	case unicode.In(c, katakanaTable):
 		return 'K'
-	case unicode.In(str, alphabetTable):
+	case unicode.In(c, alphabetTable):
 		return 'A'
-	case unicode.In(str, numberTable):
+	case unicode.In(c, numberTable):
 		return 'N'
 	}
 	return 'O'
 }
 
-func (s *Segmenter) Segment(text string) []string {
-	result := make([]string, 0, len(text))
-	if text == "" {
-		return result
+func Segment(input string) []string {
+	ret := make([]string, 0, len(input))
+	if input == "" {
+		return ret
 	}
 
 	wordstart := 0
 	pos := wordstart
 
-	p1, w1, c1 := Uchar, B3, Ochar
-	p2, w2, c2 := Uchar, B2, Ochar
-	p3, w3, c3 := Uchar, B1, Ochar
+	p1, w1, c1 := 'U', B3, 'O'
+	p2, w2, c2 := 'U', B2, 'O'
+	p3, w3, c3 := 'U', B1, 'O'
 
-	w5, c5 := E1, Ochar
-	w6, c6 := E2, Ochar
+	w5, c5 := E1, 'O'
+	w6, c6 := E2, 'O'
 
 	var pos1, pos2, pos3, size int
-	w4, pos1 := utf8.DecodeRuneInString(text[pos:]) // rune を現在の位置から取ってくる
-	c4 := s.gettype(w4)
-	if pos1 < len(text) {
-		w5, size = utf8.DecodeRuneInString(text[pos1:])
-		c5 = s.gettype(w5)
+	w4, pos1 := utf8.DecodeRuneInString(input[pos:])
+	c4 := gettype(w4)
+	if pos1 < len(input) {
+		w5, size = utf8.DecodeRuneInString(input[pos1:])
+		c5 = gettype(w5)
 		pos2 = pos1 + size
-		if pos2 < len(text) {
-			w6, size = utf8.DecodeRuneInString(text[pos2:])
-			c6 = s.gettype(w6)
+		if pos2 < len(input) {
+			w6, size = utf8.DecodeRuneInString(input[pos2:])
+			c6 = gettype(w6)
 			pos3 = pos2 + size
 		} else {
-			w6, c6 = E1, Ochar
+			w6, c6 = E1, 'O'
 		}
 	}
 
-	for pos < len(text) {
+	for pos < len(input) {
 		w1, w2, w3, w4, w5 = w2, w3, w4, w5, w6
 		c1, c2, c3, c4, c5 = c2, c3, c4, c5, c6
 
-		if pos1 == len(text) {
-			w6, c6 = E2, Ochar
-		} else if pos2 == len(text) {
-			w6, c6 = E1, Ochar
+		if pos1 == len(input) {
+			w6, c6 = E2, 'O'
+		} else if pos2 == len(input) {
+			w6, c6 = E1, 'O'
 		} else {
 			pos3 = pos2 + utf8.RuneLen(w5)
-			w6, _ = utf8.DecodeRuneInString(text[pos3:])
-			c6 = s.gettype(w6)
+			w6, _ = utf8.DecodeRuneInString(input[pos3:])
+			c6 = gettype(w6)
 		}
 
 		score := BIAS
-		if p1 == Ochar {
-			score += -214 //score += get(UP1, p1, 0)
+		if p1 == 'O' { //score += UP1[p1]
+			score += -214
 		}
-		if p2 == Bchar {
+		if p2 == 'B' { //score += UP2[p2]
 			score += 69
-		} else if p2 == Ochar {
-			score += 935 //score += get(UP2, p2, 0)
+		} else if p2 == 'O' {
+			score += 935
 		}
-		if p3 == Bchar {
-			score += 189 //score += get(UP3, p3, 0)
+		if p3 == 'B' { //score += UP3[p3]
+			score += 189
 		}
 
 		score += BP1[pair{p1, p2}]
@@ -158,10 +142,10 @@ func (s *Segmenter) Segment(text string) []string {
 		score += TW4[triple{w4, w5, w6}]
 		score += UC1[c1]
 		score += UC2[c2]
-		if c3 == Achar {
+		if c3 == 'A' { //score += UC3[c3]
 			score += -1370
-		} else if c3 == Ichar {
-			score += 2311 //score += get(UC3, c3, 0)
+		} else if c3 == 'I' {
+			score += 2311
 		}
 		score += UC4[c4]
 		score += UC5[c5]
@@ -186,18 +170,18 @@ func (s *Segmenter) Segment(text string) []string {
 		score += TQ3[quadra{p3, c1, c2, c3}]
 		score += TQ4[quadra{p3, c2, c3, c4}]
 
-		p := Ochar
+		p := 'O'
 		if score > 0 {
-			result = append(result, text[wordstart:pos1])
+			ret = append(ret, input[wordstart:pos1])
 			wordstart = pos1
-			p = Bchar
+			p = 'B'
 		}
 		p1, p2, p3 = p2, p3, p
 		pos, pos1, pos2 = pos1, pos2, pos3
 
 	}
-	if wordstart != len(text) {
-		result = append(result, text[wordstart:])
+	if wordstart != len(input) {
+		ret = append(ret, input[wordstart:])
 	}
-	return result
+	return ret
 }

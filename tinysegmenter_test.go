@@ -17,8 +17,7 @@ func init() {
 }
 
 func TestSegment(t *testing.T) {
-	s := NewSegmenter()
-	ary := s.Segment("私の名前は中野です")
+	ary := Segment("私の名前は中野です")
 	expect := []string{"私", "の", "名前", "は", "中野", "です"}
 	if !reflect.DeepEqual(ary, expect) {
 		t.Errorf("got %+v, expected %v", ary, expect)
@@ -26,15 +25,13 @@ func TestSegment(t *testing.T) {
 }
 
 func BenchmarkSegment(b *testing.B) {
-	s := NewSegmenter()
 	for i := 0; i < b.N; i++ {
-		s.Segment("私の名前は中野です")
+		Segment("私の名前は中野です")
 	}
 }
 
 func BenchmarkSegmentLargeText(b *testing.B) {
-	s := NewSegmenter()
 	for i := 0; i < b.N; i++ {
-		s.Segment(sampletext)
+		Segment(sampletext)
 	}
 }
