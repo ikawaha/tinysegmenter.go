@@ -1,4 +1,4 @@
-package tinysegmenter
+package internal
 
 import (
 	"unicode"
@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	kannumTable = []rune{
+	kanjiNumTable = []rune{
 		'一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
 		'百', '千', '万', '億', '兆',
 	}
@@ -45,8 +45,8 @@ var (
 	}
 )
 
-func gettype(c rune) rune {
-	for _, x := range kannumTable {
+func runeType(c rune) rune {
+	for _, x := range kanjiNumTable {
 		if x == c {
 			return 'M'
 		}
@@ -67,11 +67,10 @@ func gettype(c rune) rune {
 }
 
 func Segment(input string) []string {
-	ret := make([]string, 0, len(input))
 	if input == "" {
-		return ret
+		return nil
 	}
-
+	ret := make([]string, 0, len(input))
 	wordstart := 0
 	pos := wordstart
 
@@ -84,14 +83,14 @@ func Segment(input string) []string {
 
 	var pos1, pos2, pos3, size int
 	w4, pos1 := utf8.DecodeRuneInString(input[pos:])
-	c4 := gettype(w4)
+	c4 := runeType(w4)
 	if pos1 < len(input) {
 		w5, size = utf8.DecodeRuneInString(input[pos1:])
-		c5 = gettype(w5)
+		c5 = runeType(w5)
 		pos2 = pos1 + size
 		if pos2 < len(input) {
 			w6, size = utf8.DecodeRuneInString(input[pos2:])
-			c6 = gettype(w6)
+			c6 = runeType(w6)
 			pos3 = pos2 + size
 		} else {
 			w6, c6 = E1, 'O'
@@ -109,7 +108,7 @@ func Segment(input string) []string {
 		} else {
 			pos3 = pos2 + utf8.RuneLen(w5)
 			w6, _ = utf8.DecodeRuneInString(input[pos3:])
-			c6 = gettype(w6)
+			c6 = runeType(w6)
 		}
 
 		score := BIAS
@@ -165,10 +164,10 @@ func Segment(input string) []string {
 		score += BQ2[triple{p2, c3, c4}]
 		score += BQ3[triple{p3, c2, c3}]
 		score += BQ4[triple{p3, c3, c4}]
-		score += TQ1[quadra{p2, c1, c2, c3}]
-		score += TQ2[quadra{p2, c2, c3, c4}]
-		score += TQ3[quadra{p3, c1, c2, c3}]
-		score += TQ4[quadra{p3, c2, c3, c4}]
+		score += TQ1[quad{p2, c1, c2, c3}]
+		score += TQ2[quad{p2, c2, c3, c4}]
+		score += TQ3[quad{p3, c1, c2, c3}]
+		score += TQ4[quad{p3, c2, c3, c4}]
 
 		p := 'O'
 		if score > 0 {

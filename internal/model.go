@@ -1,16 +1,10 @@
-package tinysegmenter
+package internal
 
-type pair struct {
-	a, b rune
-}
-
-type triple struct {
-	a, b, c rune
-}
-
-type quadra struct {
-	a, b, c, d rune
-}
+type (
+	pair   [2]rune
+	triple [3]rune
+	quad   [4]rune
+)
 
 const (
 	B1 rune = 0x110001
@@ -18,7 +12,8 @@ const (
 	B3 rune = 0x110003
 	E1 rune = 0x110004
 	E2 rune = 0x110005
-	E3 rune = 0x110006
+
+//	E3 rune = 0x110006
 )
 
 var (
@@ -513,7 +508,7 @@ var (
 		{'I', 'I', 'I'}: 1497,  //III
 		{'I', 'I', 'H'}: 321,   //IIH
 	}
-	TQ1 = map[quadra]int{
+	TQ1 = map[quad]int{
 		{'O', 'I', 'H', 'I'}: 200,  //OIHI
 		{'O', 'I', 'I', 'H'}: -67,  //OIIH
 		{'B', 'N', 'H', 'H'}: -743, //BNHH
@@ -528,13 +523,13 @@ var (
 		{'B', 'I', 'I', 'I'}: 1595, //BIII
 		{'B', 'I', 'H', 'H'}: 60,   //BIHH
 	}
-	TQ2 = map[quadra]int{
+	TQ2 = map[quad]int{
 		{'B', 'I', 'H', 'H'}: -1400, //BIHH
 		{'B', 'I', 'I', 'I'}: -1032, //BIII
 		{'B', 'O', 'O', 'O'}: -5590, //BOOO
 		{'B', 'K', 'A', 'K'}: -542,  //BKAK
 	}
-	TQ3 = map[quadra]int{
+	TQ3 = map[quad]int{
 		{'B', 'M', 'H', 'I'}: -862,  //BMHI
 		{'O', 'O', 'H', 'H'}: 110,   //OOHH
 		{'B', 'H', 'H', 'H'}: 478,   //BHHH
@@ -556,7 +551,7 @@ var (
 		{'O', 'K', 'A', 'K'}: 2792,  //OKAK
 		{'O', 'K', 'K', 'A'}: 679,   //OKKA
 	}
-	TQ4 = map[quadra]int{
+	TQ4 = map[quad]int{
 		{'O', 'A', 'K', 'K'}: 180,   //OAKK
 		{'O', 'I', 'H', 'I'}: -492,  //OIHI
 		{'O', 'H', 'H', 'O'}: 480,   //OHHO
@@ -637,10 +632,10 @@ var (
 		'H': 1059,
 		'O': 646,
 	}
-	UC3 = map[rune]int{
-		'A': -1369,
-		'I': 2311,
-	}
+	//UC3 = map[rune]int{
+	//	'A': -1369,
+	//	'I': 2311,
+	//}
 	UC4 = map[rune]int{
 		'N': 3876,
 		'H': 1809,
@@ -664,16 +659,16 @@ var (
 		'I': -252,
 		'K': 87,
 	}
-	UP1 = map[rune]int{
-		'O': -213,
-	}
-	UP2 = map[rune]int{
-		'B': 69,
-		'O': 935,
-	}
-	UP3 = map[rune]int{
-		'B': 189,
-	}
+	//UP1 = map[rune]int{
+	//	'O': -214,
+	//}
+	//UP2 = map[rune]int{
+	//	'B': 69,
+	//	'O': 935,
+	//}
+	//UP3 = map[rune]int{
+	//	'B': 189,
+	//}
 	UQ1 = map[pair]int{
 		{'B', 'H'}: 21,    //BH
 		{'B', 'N'}: 142,   //BN

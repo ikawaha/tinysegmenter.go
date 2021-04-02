@@ -1,7 +1,7 @@
-[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
-tinysegmenter
+TinySegmenter.go
 ===
 
-tinysegmenter.go is a golang clone of https://github.com/chezou/TinySegmenter.jl
+TinySegmenter.go is a Go clone of julia version of [TinySegmenter](https://github.com/chezou/TinySegmenter.jl)  which is an extremely compact Japanese tokenizer [originally written](http://chasen.org/~taku/software/TinySegmenter/) in JavaScript by Dr. Taku Kudo.
 
-:octocat: blog http://ikawaha.hateblo.jp/entry/2015/10/23/161351
+---
+MIT
