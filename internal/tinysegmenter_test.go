@@ -1,20 +1,13 @@
-package tinysegmenter
+package internal
 
 import (
-	"io/ioutil"
+	_ "embed"
 	"reflect"
 	"testing"
 )
 
+//go:embed testdata/timemachineu8j.txt
 var sampletext string
-
-func init() {
-	b, err := ioutil.ReadFile("./timemachineu8j.txt")
-	if err != nil {
-		panic(err)
-	}
-	sampletext = string(b)
-}
 
 func TestSegment(t *testing.T) {
 	ary := Segment("私の名前は中野です")
